@@ -31,14 +31,14 @@ class RefractedTextWidget extends StatelessWidget {
   final String? fontFamily;
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
       child: Material(
         color: Colors.transparent,
         child: Text(
           text,
           maxLines: maxLines ?? 1,
-          textAlign: align ?? TextAlign.start,
+          textAlign: align ?? TextAlign.center,
           overflow: overflow,
           style: TextStyle(
               fontFamily: fontFamily,
@@ -48,7 +48,7 @@ class RefractedTextWidget extends StatelessWidget {
               fontSize: textSize != null
                   ? textSize?.sp
                   : isSubText == false
-                      ? 25.sp
+                      ? 23.sp
                       : 14.sp,
               // ignore: prefer_if_null_operators
               fontWeight: textWeight == null
