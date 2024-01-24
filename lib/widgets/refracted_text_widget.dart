@@ -48,8 +48,8 @@ class RefractedTextWidget extends StatelessWidget {
               fontSize: textSize != null
                   ? textSize?.sp
                   : isSubText == false
-                      ? 20.sp
-                      : 18.sp,
+                      ? 25.sp
+                      : 14.sp,
               // ignore: prefer_if_null_operators
               fontWeight: textWeight == null
                   ? isSubText == true
