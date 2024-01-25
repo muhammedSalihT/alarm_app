@@ -5,13 +5,16 @@ import 'package:alarm_app/screens/alarm_setting_screen/view_model/alarm_setting_
 import 'package:alarm_app/service/local_notification_service.dart';
 import 'package:alarm_app/utils/app_navigation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((value) => runApp(const MyApp()));
   await LocalNotificationService.initLocalNotification();
+  
 }
 
 class MyApp extends StatelessWidget {

@@ -1,38 +1,12 @@
-import 'dart:developer';
-
+import 'dart:async';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 import 'package:alarm_app/screens/add_or_update_alarm/model/alarm_info.dart';
 import 'package:alarm_app/screens/alarm_setting_screen/view/alarm_setting_view.dart';
 import 'package:alarm_app/utils/app_navigation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-// Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-//   DartPluginRegistrant.ensureInitialized();
-//   if (!Hive.isAdapterRegistered(1)) {
-//     Hive.registerAdapter(NotificationModelAdapter());
-//   }
-
-//   // THIS BELOW LINE CAUSE ERROR WHILE APP IS IN TERMINATED STATE
-//   final path = (await getApplicationDocumentsDirectory()).path;
-
-//   /// init hive
-//   Hive.init(path);
-
-//   if (Hive.isBoxOpen('notiList')) {
-//     await Hive.box<List>('notiList').close();
-//   }
-
-//   final NotificationProvider notiPro = NotificationProvider();
-//   // print('Background ');
-//   //  IsolateNameServer.lookupPortByName('main_port')?.send(message);
-
-//   notiPro.getNotifications();
-//   notiPro.addMessages(currentMsg: message);
-// }
-
 class LocalNotificationService {
-  // creates firbasemessage instence
-  // final _firebaseMessage = FirebaseMessaging.instance;
-
   //create local noti instence
   static final _localNoti = FlutterLocalNotificationsPlugin();
 
@@ -43,86 +17,83 @@ class LocalNotificationService {
     'High Importance Notifications', // title
     description:
         'This channel is used for important notifications.', // description
+    sound: RawResourceAndroidNotificationSound('slow_spring_board'),
+    playSound: true,
     importance: Importance.max,
   );
 
   // initilaise local notification
-
   static Future<void> initLocalNotification() async {
-    const ios = DarwinInitializationSettings();
-    const android = AndroidInitializationSettings('ic_launcher_playstore');
-    const settings = InitializationSettings(android: android, iOS: ios);
-    _localNoti
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
+    var initializationSettingsAndroid =
+        const AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializationSettingsIOS = DarwinInitializationSettings(
+        requestAlertPermission: true,
+        requestBadgePermission: true,
+        requestSoundPermission: true,
+        onDidReceiveLocalNotification:
+            (int id, String? title, String? body, String? payload) async {});
+    var initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+    tz.initializeTimeZones();
     await _localNoti.initialize(
-      settings,
-      onDidReceiveNotificationResponse: (payload) {
-        log('onDidnoti');
-        onOpenMessage(payload);
-      },
+      initializationSettings,
+      onDidReceiveNotificationResponse: (details) => onOpenMessage(),
     );
 
+    //  handle in terminated state
+    var initialNotification =
+        await _localNoti.getNotificationAppLaunchDetails();
+    if (initialNotification?.didNotificationLaunchApp == true) {
+      onOpenMessage();
+    }
+
+    //init channel
     final platform = _localNoti.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
     await platform?.createNotificationChannel(_androidChannel);
   }
 
-  //initialise notification
-  Future<void> initialiseNotification() async {
-    // call to handle
-    // await onHandleBackOrTerminte();
-    initLocalNotification();
-  }
-
   //handle notification open in app
 
-  static Future<void> onOpenMessage(NotificationResponse? message) async {
-    if (message == null) return;
-    AppNavigation.push(
+  static Future<void> onOpenMessage() async {
+    AppNavigation.pushAndRemoveUntil(
       context: AppNavigation.navigatorKey.currentState?.context,
       materialRoutePage: const AlarmSettingView(),
     );
   }
 
-  void scheduleAlarm(
-      DateTime scheduledNotificationDateTime, AlarmModel alarmInfo,
-      {required bool isRepeating}) async {
-    var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-      'alarm_notif',
-      'alarm_notif',
-      channelDescription: 'Channel for Alarm notification',
-      icon: 'codex_logo',
-      sound: RawResourceAndroidNotificationSound('a_long_cold_sting'),
-      largeIcon: DrawableResourceAndroidBitmap('codex_logo'),
+  static void scheduleAlarm({
+    required AlarmModel alarmData,
+  }) async {
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      _androidChannel.id,
+      _androidChannel.name,
+      channelDescription: _androidChannel.description,
+      sound: const RawResourceAndroidNotificationSound('slow_spring_board'),
+      priority: Priority.high,
+      importance: Importance.high,
+      playSound: true,
     );
 
-    // var iOSPlatformChannelSpecifics = IOSNotificationDetails(
-    //   sound: 'a_long_cold_sting.wav',
-    //   presentAlert: true,
-    //   presentBadge: true,
-    //   presentSound: true,
-    // );
+    var iOSPlatformChannelSpecifics = const DarwinNotificationDetails(
+      // sound: 'a_long_cold_sting.wav',
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
     var platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
-      // iOS: iOSPlatformChannelSpecifics,
+      iOS: iOSPlatformChannelSpecifics,
     );
+
+    await _localNoti.zonedSchedule(
+        0,
+        '',
+        alarmData.label,
+        tz.TZDateTime.from(alarmData.alarmSetTime, tz.local),
+        platformChannelSpecifics,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime);
   }
-
-  //handle message in background or terminte
-
-  // Future<void> onHandleBackOrTerminte() async {
-  //   _localNoti.show(
-  //       notification.hashCode,
-  //       notification?.title,
-  //       notification?.body,
-  //       NotificationDetails(
-  //         android: AndroidNotificationDetails(
-  //             _androidChannel.id, _androidChannel.name,
-  //             channelDescription: _androidChannel.description,
-  //             icon: 'ic_launcher_foreground'),
-  //       ),
-  //       payload: jsonEncode(message.toMap()));
-  // }
 }

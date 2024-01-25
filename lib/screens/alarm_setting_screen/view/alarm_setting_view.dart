@@ -103,6 +103,22 @@ class _AlarmSettingViewState extends State<AlarmSettingView> {
       ]),
       body: Consumer<AlarmSettingProvider>(
           builder: (context, alarmSettProvider, _) {
+        if (alarmSettProvider.isAlarmListEmpty) {
+          return Padding(
+              padding: EdgeInsets.only(bottom: .2.sh),
+              child: const Center(
+                child: RefractedTextWidget(
+                  text: 'Add your alarm',
+                  textColor: AppColors.appGrey,
+                ),
+              ));
+        }
+        if (alarmSettProvider.alarmList.isEmpty) {
+          return Padding(
+            padding: EdgeInsets.only(bottom: .2.sh),
+            child: UtilWidgets.refractedCupertinoLoadingWidget(radius: 30.r),
+          );
+        }
         return ListView.builder(
           physics: const BouncingScrollPhysics(),
           itemBuilder: (context, index) {

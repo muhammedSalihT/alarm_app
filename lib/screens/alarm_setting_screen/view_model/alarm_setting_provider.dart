@@ -14,11 +14,18 @@ class AlarmSettingProvider extends ChangeNotifier {
   WeatherModel? watherModel;
   bool isLoading = false;
   List<AlarmModel> alarmList = [];
+  bool isAlarmListEmpty = false;
 
   void getAlarmList() async {
     alarmList = await LocalDatabaseService.getAlarms();
     notifyListeners();
     log(alarmList.toString());
+    if (alarmList.isEmpty) {
+      isAlarmListEmpty = true;
+    } else {
+      isAlarmListEmpty = false;
+    }
+    notifyListeners();
   }
 
   getCurrentLocation() async {
