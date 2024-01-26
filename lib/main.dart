@@ -14,7 +14,6 @@ void main() async {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((value) => runApp(const MyApp()));
   await LocalNotificationService.initLocalNotification();
-  
 }
 
 class MyApp extends StatelessWidget {

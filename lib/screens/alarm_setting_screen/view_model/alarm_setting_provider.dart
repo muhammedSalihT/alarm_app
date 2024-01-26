@@ -16,6 +16,8 @@ class AlarmSettingProvider extends ChangeNotifier {
   List<AlarmModel> alarmList = [];
   bool isAlarmListEmpty = false;
 
+  // for get saved alarms
+
   void getAlarmList() async {
     alarmList = await LocalDatabaseService.getAlarms();
     notifyListeners();
@@ -28,6 +30,7 @@ class AlarmSettingProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // get user location
   getCurrentLocation() async {
     position = await determinePosition();
     if (position != null) {
@@ -35,6 +38,7 @@ class AlarmSettingProvider extends ChangeNotifier {
     }
   }
 
+  //get weather details
   getWheatherUpdate() async {
     isLoading = true;
     notifyListeners();
@@ -46,7 +50,6 @@ class AlarmSettingProvider extends ChangeNotifier {
         },
       ]
     };
-    print("data: $data");
 
     var d = jsonEncode(data);
     Response? response = await ApiService.apiMethodSetup(
@@ -59,12 +62,10 @@ class AlarmSettingProvider extends ChangeNotifier {
         });
 
     if (response != null) {
-      print(response.data.toString());
       var encode = jsonEncode(response.data["bulk"][0]);
 
       watherModel = weatherModelMapFromJson(encode);
       if (watherModel != null) {
-        print(watherModel!.query.location.name);
         isLoading = false;
         notifyListeners();
       }
