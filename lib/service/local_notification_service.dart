@@ -47,7 +47,7 @@ class LocalNotificationService {
         sound: RawResourceAndroidNotificationSound("slow_spring_board"),
         playSound: true,
         importance: Importance.max,
-        priority: Priority.max);
+        priority: Priority.high);
 
     var iOSPlatformChannelSpecifics = const DarwinNotificationDetails(
       // sound: 'a_long_cold_sting.wav',
@@ -68,6 +68,6 @@ class LocalNotificationService {
         platformChannelSpecifics,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime);
+            UILocalNotificationDateInterpretation.wallClockTime);
   }
 }

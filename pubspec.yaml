@@ -43,6 +43,8 @@ dependencies:
   intl: ^0.19.0
   flutter_local_notifications: ^16.2.0
   timezone: ^0.9.2
+  ruler_scale_picker: ^0.1.0
+  flutter_ruler_picker: ^1.0.6
 
 dev_dependencies:
   flutter_test:

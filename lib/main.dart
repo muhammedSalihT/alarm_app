@@ -1,4 +1,5 @@
 import 'package:alarm_app/constents/app_colors.dart';
+import 'package:alarm_app/screens/about_us_view.dart';
 import 'package:alarm_app/screens/add_or_update_alarm/view_model/add_or_update_provider.dart';
 import 'package:alarm_app/screens/alarm_setting_screen/view/alarm_setting_view.dart';
 import 'package:alarm_app/screens/alarm_setting_screen/view_model/alarm_setting_provider.dart';
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSeed(seedColor: AppColors.appBlue),
             useMaterial3: true,
           ),
-          home: const AlarmSettingView(),
+          home: const AboutUsView(),
         ),
       );
     });

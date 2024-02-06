@@ -136,6 +136,24 @@ class _AddOrUpdateAlarmViewState extends State<AddOrUpdateAlarmView> {
                   ),
                 ),
               ),
+              ConstrainedBox(
+                constraints:
+                    const BoxConstraints(maxHeight: 100, minHeight: 50),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        height: index.isEven ? 100 : 50,
+                        width: 1,
+                        color: AppColors.appGrey,
+                      ),
+                    );
+                  },
+                ),
+              )
             ],
           ),
         ),
